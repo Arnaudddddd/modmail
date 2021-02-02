@@ -1060,7 +1060,7 @@ class Thread:
 
     async def set_title(self, title) -> None:
         user_id = match_user_id(self.channel.topic)
-        await self.channel.edit(topic=f"Title: {title}\nUser ID: {user_id}")
+        await self.channel.edit(name=f"{title}")
 
 
 class ThreadManager:
