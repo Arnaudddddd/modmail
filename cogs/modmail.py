@@ -652,15 +652,13 @@ class Modmail(commands.Cog):
             embeds.append(embed)
         return embeds
 
-    @commands.command(cooldown_after_parsing=True)
+    @commands.command()
     @checks.has_permissions(PermissionLevel.SUPPORTER)
     @checks.thread_only()
-    @commands.cooldown(1, 600, BucketType.channel)
     async def title(self, ctx, *, name: str):
         """Sets title for a thread"""
         await ctx.thread.set_title(name)
         sent_emoji, _ = await self.bot.retrieve_emoji()
-        await ctx.message.pin()
         await self.bot.add_reaction(ctx.message, sent_emoji)
 
     @commands.group(invoke_without_command=True)
