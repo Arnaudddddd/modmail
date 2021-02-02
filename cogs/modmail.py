@@ -655,9 +655,9 @@ class Modmail(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     @checks.has_permissions(PermissionLevel.SUPPORTER)
     @checks.thread_only()
-    async def title(self, ctx, *, name: str):
-        """Sets title for a thread"""
-        await ctx.message.channel(name)
+    async def set_title(self, title) -> None:
+        user_id = match_user_id(self.channel.topic)
+        await self.channel.edit(name=f"{title}")
 
     @commands.group(invoke_without_command=True)
     @checks.has_permissions(PermissionLevel.SUPPORTER)
