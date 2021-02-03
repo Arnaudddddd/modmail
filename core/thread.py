@@ -456,7 +456,7 @@ class Thread:
 
         embed.title = user
 
-        event = "Thread Closed as Scheduled" if scheduled else "Thread Closed"
+        event = "Discussion fermée comme prévu" if scheduled else "ticket fermé"
         # embed.set_author(name=f"Event: {event}", url=log_url)
         embed.set_footer(text=f"{event} by {_closer}", icon_url=closer.avatar_url)
         embed.timestamp = datetime.utcnow()
@@ -562,13 +562,13 @@ class Thread:
                 or not message1.embeds[0].author.url
                 or message1.author != self.bot.user
             ):
-                raise ValueError("Malformed thread message.")
+                raise ValueError("Message de fil mal formé.")
 
         elif message_id is not None:
             try:
                 message1 = await self.channel.fetch_message(message_id)
             except discord.NotFound:
-                raise ValueError("Thread message not found.")
+                raise ValueError("Message de discussion introuvable.")
 
             if not (
                 message1.embeds
@@ -576,20 +576,20 @@ class Thread:
                 and message1.embeds[0].color
                 and message1.author == self.bot.user
             ):
-                raise ValueError("Thread message not found.")
+                raise ValueError("Message de discussion introuvable.")
 
             if message1.embeds[0].color.value == self.bot.main_color and (
                 message1.embeds[0].author.name.startswith("Note")
-                or message1.embeds[0].author.name.startswith("Persistent Note")
+                or message1.embeds[0].author.name.startswith("Note persistante")
             ):
                 if not note:
-                    raise ValueError("Thread message not found.")
+                    raise ValueError("Message de discussion introuvable.")
                 return message1, None
 
             if message1.embeds[0].color.value != self.bot.mod_color and not (
                 either_direction and message1.embeds[0].color.value == self.bot.recipient_color
             ):
-                raise ValueError("Thread message not found.")
+                raise ValueError("Message de discussion introuvable.")
         else:
             async for message1 in self.channel.history():
                 if (
@@ -627,13 +627,13 @@ class Thread:
                     return message1, msg
             except ValueError:
                 continue
-        raise ValueError("DM message not found. Plain messages are not supported.")
+        raise ValueError("Message DM introuvable. Les messages simples ne sont pas pris en charge.")
 
     async def edit_message(self, message_id: typing.Optional[int], message: str) -> None:
         try:
             message1, message2 = await self.find_linked_messages(message_id)
         except ValueError:
-            logger.warning("Failed to edit message.", exc_info=True)
+            logger.warning("Échec de la modification du message.", exc_info=True)
             raise
 
         embed1 = message1.embeds[0]
@@ -741,8 +741,8 @@ class Thread:
             return await message.channel.send(
                 embed=discord.Embed(
                     color=self.bot.error_color,
-                    description="Your message could not be delivered since "
-                    "the recipient shares no servers with the bot.",
+                    description="Votre message n'a pas pu être livré depuis "
+                    "le destinataire ne partage aucun serveur avec le bot.",
                 )
             )
 
@@ -760,16 +760,16 @@ class Thread:
             logger.error("Message delivery failed:", exc_info=True)
             if isinstance(e, discord.Forbidden):
                 description = (
-                    "Your message could not be delivered as "
-                    "the recipient is only accepting direct "
-                    "messages from friends, or the bot was "
-                    "blocked by the recipient."
+                    "Votre message n'a pas pu être livré en tant que "
+                    "le destinataire n'accepte que le direct "
+                    "messages d'amis, ou le bot était "
+                    "bloqué par le destinataire."
                 )
             else:
                 description = (
-                    "Your message could not be delivered due "
-                    "to an unknown error. Check `?debug` for "
-                    "more information"
+                    "Votre message n'a pas pu être livré en raison "
+                    " une erreur inconnue. Vérifiez `?Debug` pour "
+                    "Plus d'information"
                 )
             tasks.append(
                 message.channel.send(
@@ -798,7 +798,7 @@ class Thread:
                     self.channel.send(
                         embed=discord.Embed(
                             color=self.bot.error_color,
-                            description="Scheduled close has been cancelled.",
+                            description="La fermeture programmée a été annulée.",
                         )
                     )
                 )
@@ -831,7 +831,7 @@ class Thread:
                 self.channel.send(
                     embed=discord.Embed(
                         color=self.bot.error_color,
-                        description="Scheduled close has been cancelled.",
+                        description="La fermeture programmée a été annulée.",
                     )
                 )
             )
@@ -971,7 +971,7 @@ class Thread:
             embed.colour = self.bot.mod_color
             # Anonymous reply sent in thread channel
             if anonymous and isinstance(destination, discord.TextChannel):
-                embed.set_footer(text="Anonymous Reply")
+                embed.set_footer(text="Réponse anonyme")
             # Normal messages
             elif not anonymous:
                 mod_tag = self.bot.config["mod_tag"]
@@ -992,19 +992,19 @@ class Thread:
                 try:
                     await message.delete()
                 except Exception as e:
-                    logger.warning("Cannot delete message: %s.", e)
+                    logger.warning("Impossible de supprimer le message: %s.", e)
 
         if (
             from_mod
             and self.bot.config["dm_disabled"] == DMDisabled.ALL_THREADS
             and destination != self.channel
         ):
-            logger.info("Sending a message to %s when DM disabled is set.", self.recipient)
+            logger.info("Envoi d'un message à %s lorsque DM désactivé est défini.", self.recipient)
 
         try:
             await destination.trigger_typing()
         except discord.NotFound:
-            logger.warning("Channel not found.")
+            logger.warning("Chaîne introuvable.")
             raise
 
         if not from_mod and not note:
@@ -1098,7 +1098,7 @@ class ThreadManager:
                     ((k, v) for k, v in self.cache.items() if v.channel == channel), (-1, None)
                 )
                 if thread is not None:
-                    logger.debug("Found thread with tempered ID.")
+                    logger.debug("Fil trouvé avec ID tempéré.")
                     await channel.edit(topic=f"User ID: {user_id}")
             return thread
 
@@ -1110,12 +1110,12 @@ class ThreadManager:
             try:
                 await thread.wait_until_ready()
             except asyncio.CancelledError:
-                logger.warning("Thread for %s cancelled, abort creating", recipient)
+                logger.warning("Fil pour %s annulé, abandonner la création", recipient)
                 return thread
             else:
                 if not thread.channel or not self.bot.get_channel(thread.channel.id):
                     logger.warning(
-                        "Found existing thread for %s but the channel is invalid.", recipient_id
+                        "Fil de discussion existant trouvé pour %s mais le canal n'est pas valide.", recipient_id
                     )
                     self.bot.loop.create_task(
                         thread.close(closer=self.bot.user, silent=True, delete_channel=False)
@@ -1180,14 +1180,14 @@ class ThreadManager:
             try:
                 await thread.wait_until_ready()
             except asyncio.CancelledError:
-                logger.warning("Thread for %s cancelled, abort creating", recipient)
+                logger.warning("Fil pour %s annulé, abandonner la création", recipient)
                 return thread
             else:
                 if thread.channel and self.bot.get_channel(thread.channel.id):
-                    logger.warning("Found an existing thread for %s, abort creating.", recipient)
+                    logger.warning("Vous avez trouvé un fil de discussion existant pour %s, abandonner la création.", recipient)
                     return thread
                 logger.warning(
-                    "Found an existing thread for %s, closing previous thread.", recipient
+                    "Found an existing thread for %s, fermeture du fil précédent.", recipient
                 )
                 self.bot.loop.create_task(
                     thread.close(closer=self.bot.user, silent=True, delete_channel=False)
@@ -1241,7 +1241,7 @@ class ThreadManager:
                 await confirm.remove_reaction(deny_emoji, self.bot.user)
                 await message.channel.send(
                     embed=discord.Embed(
-                        title="Cancelled", description="Timed out", color=self.bot.error_color
+                        title="Annulé", description="Fin du temps", color=self.bot.error_color
                     )
                 )
                 del self.cache[recipient.id]
@@ -1254,7 +1254,7 @@ class ThreadManager:
                     await asyncio.sleep(0.2)
                     await confirm.remove_reaction(deny_emoji, self.bot.user)
                     await message.channel.send(
-                        embed=discord.Embed(title="Cancelled", color=self.bot.error_color)
+                        embed=discord.Embed(title="Annulé", color=self.bot.error_color)
                     )
                     del self.cache[recipient.id]
                     return thread
