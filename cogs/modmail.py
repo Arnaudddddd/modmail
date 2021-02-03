@@ -950,7 +950,7 @@ class Modmail(commands.Cog):
             return await ctx.send(
                 embed=discord.Embed(
                     title="Failed",
-                    description="Cannot find a message to edit. Plain messages are not supported.",
+                    description="Impossible de trouver un message à modifier. Les messages simples ne sont pas pris en charge.",
                     color=self.bot.error_color,
                 )
             )
@@ -1012,9 +1012,9 @@ class Modmail(commands.Cog):
 
             if not silent and not self.bot.config.get("thread_contact_silently"):
                 if ctx.author.id == user.id:
-                    description = "You have opened a Modmail thread."
+                    description = "Vous avez ouvert un ticket."
                 else:
-                    description = f"{ctx.author.name} has opened a Modmail thread."
+                    description = f"{ctx.author.name} a ouvert un ticket."
 
                 em = discord.Embed(
                     title="New Thread", description=description, color=self.bot.main_color,
@@ -1112,7 +1112,7 @@ class Modmail(commands.Cog):
             embed = embeds[0]
 
             for mention, reason in users:
-                line = mention + f" - {reason or 'No Reason Provided'}\n"
+                line = mention + f" - {reason or 'Aucune raison fournie'}\n"
                 if len(embed.description) + len(line) > 2048:
                     embed = discord.Embed(
                         title="Blocked Users (Continued)",
@@ -1380,8 +1380,8 @@ class Modmail(commands.Cog):
             logger.warning("Failed to delete message: %s.", e)
             return await ctx.send(
                 embed=discord.Embed(
-                    title="Failed",
-                    description="Cannot find a message to delete. Plain messages are not supported.",
+                    title="Échoué",
+                    description="Impossible de trouver un message à supprimer. Les messages simples ne sont pas pris en charge.",
                     color=self.bot.error_color,
                 )
             )
