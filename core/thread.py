@@ -867,16 +867,13 @@ class Thread:
                 embed.set_author(
                     name=name,
                     icon_url=avatar_url,
-                    url=f"https://discordapp.com/channels/{self.bot.guild.id}#{message.id}",
                 )
             else:
                 # Normal message
                 name = str(author)
                 avatar_url = author.avatar_url
                 embed.set_author(
-                    name=name,
-                    icon_url=avatar_url,
-                    url=f"https://discordapp.com/users/{author.id}#{message.id}",
+                    name="",
                 )
         else:
             # Special note messages
