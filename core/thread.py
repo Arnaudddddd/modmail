@@ -867,7 +867,6 @@ class Thread:
                 embed.set_author(
                     name=name,
                     icon_url=avatar_url,
-                    url=f"https://discordapp.com/channels/{self.bot.guild.id}#{message.id}",
                 )
             else:
                 # Normal message
@@ -876,14 +875,12 @@ class Thread:
                 embed.set_author(
                     name=name,
                     icon_url=avatar_url,
-                    url=f"https://discordapp.com/users/{author.id}#{message.id}",
                 )
         else:
             # Special note messages
             embed.set_author(
                 name=f"{'Persistent' if persistent_note else ''} Note ({author.name})",
                 icon_url=system_avatar_url,
-                url=f"https://discordapp.com/users/{author.id}#{message.id}",
             )
 
         ext = [(a.url, a.filename, False) for a in message.attachments]
