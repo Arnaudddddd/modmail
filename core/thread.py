@@ -871,9 +871,10 @@ class Thread:
             else:
                 # Normal message
                 name = str(author)
-                avatar_url = author.avatar_url
+                avatar_url = self.bot.guild.icon_url
                 embed.set_author(
-                    name="",
+                    name="Staff",
+                    icon_url=avatar_url,
                 )
         else:
             # Special note messages
